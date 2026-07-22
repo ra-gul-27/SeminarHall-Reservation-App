@@ -62,7 +62,12 @@ This architecture is chosen to guarantee **scalability** and **maintainability**
    - Configure your `.env` file with the correct Postgres connection string.
    - Run `npx prisma db push` or `npx prisma migrate dev` to sync the database schema.
    - Run `npm start` or `npm run dev` to start the API server.
-3. **Client Setup**:
+3.**SUR**
+-DATABASE_URL="postgresql://postgres:Ragul@2006@localhost:5432/seminar_halls?schema=public"
+-JWT_SECRET="super-secret-seminar-key-change-in-production"
+PORT=5000
+
+4. **Client Setup**:
    - Navigate to `/client`.
    - Run `npm install` to download dependencies.
    - Run `npx expo start` to launch the Metro bundler.
