@@ -1,0 +1,56 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  password_hash String
+  role          Role     @default(STAFF)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  reservations  Reservation[]
+}
+
+model Hall {
+  id          String   @id @default(uuid())
+  name        String
+  capacity    Int
+  features    String[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  reservations Reservation[]
+}
+
+model Reservation {
+  id        String   @id @default(uuid())
+  userId    String
+  hallId    String
+  startTime DateTime
+  endTime   DateTime
+  purpose   String
+  status    Status   @default(PENDING)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      User     @relation(fields: [userId], references: [id])
+  hall      Hall     @relation(fields: [hallId], references: [id])
+}
+
+enum Role {
+  STAFF
+  ADMIN
+}
+
+enum Status {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
