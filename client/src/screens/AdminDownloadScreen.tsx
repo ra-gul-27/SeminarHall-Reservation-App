@@ -4,6 +4,9 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import * as FileSystem from 'expo-file-system/legacy';
+import * as Sharing from 'expo-sharing';
+import { reservationService } from '../services/reservationService';
 
 import AdminBottomNavBar from '../components/AdminBottomNavBar';
 
@@ -29,24 +32,93 @@ export default function AdminDownloadScreen() {
     }
   };
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     if (!selectedOption) {
       Alert.alert("Selection Required", "Please select a statement period to generate.");
       return;
     }
 
-    // Simulate generation delay
-    Alert.alert(
-      "Generating Report",
-      `Compiling report for: ${selectedOption}...`,
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Download PDF",
-          onPress: () => Alert.alert("Success", "Statement downloaded successfully to your device.")
-        }
-      ]
-    );
+    try {
+      Alert.alert("Generating Report", "Please wait while we fetch and compile the data...");
+      
+      const response = await reservationService.getReservations();
+      if (!response.success) {
+        Alert.alert('Error', 'Failed to fetch reservations from the database.');
+        return;
+      }
+
+      let dataToExport = response.data;
+      const now = new Date();
+
+      if (selectedOption === 'current_month') {
+        dataToExport = dataToExport.filter((r: any) => {
+          const d = new Date(r.startTime);
+          return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+        });
+      } else if (selectedOption === 'last_2_months') {
+        const twoMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+        dataToExport = dataToExport.filter((r: any) => new Date(r.startTime) >= twoMonthsAgo);
+      } else if (selectedOption === 'last_3_months') {
+        const threeMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 2, 1);
+        dataToExport = dataToExport.filter((r: any) => new Date(r.startTime) >= threeMonthsAgo);
+      } else if (selectedOption === 'custom_range') {
+        dataToExport = dataToExport.filter((r: any) => {
+          const d = new Date(r.startTime);
+          // Set end date to end of day to include the full day
+          const endOfDay = new Date(endDate);
+          endOfDay.setHours(23, 59, 59, 999);
+          return d >= startDate && d <= endOfDay;
+        });
+      }
+
+      if (dataToExport.length === 0) {
+        Alert.alert('No Data', 'There are no reservations for the selected period.');
+        return;
+      }
+
+      // Generate CSV String
+      const header = "Date,Start Time,End Time,Venue,Organizer,Department,Purpose\n";
+      const rows = dataToExport.map((r: any) => {
+        let parsedPurpose = { organizer: r.user?.email || 'N/A', department: 'N/A', purpose: r.purpose || 'N/A' };
+        try {
+          parsedPurpose = JSON.parse(r.purpose);
+        } catch(e) {}
+
+        const dateObj = new Date(r.startTime);
+        const dateString = dateObj.toLocaleDateString();
+        const startTimeString = dateObj.toLocaleTimeString();
+        const endTimeString = new Date(r.endTime).toLocaleTimeString();
+        
+        let venueName = 'Unknown';
+        if(r.hallId === 'main') venueName = 'MT Seminar Hall';
+        else if(r.hallId === 'mini') venueName = 'Lib Seminar Hall';
+        else if(r.hallId === 'meeting') venueName = 'Meeting Hall';
+
+        // Escape quotes by doubling them for CSV format
+        const cleanPurpose = parsedPurpose.purpose ? parsedPurpose.purpose.replace(/"/g, '""') : '';
+        return `"${dateString}","${startTimeString}","${endTimeString}","${venueName}","${parsedPurpose.organizer}","${parsedPurpose.department}","${cleanPurpose}"`;
+      });
+
+      const csvString = header + rows.join('\n');
+      const fileName = `Campus_Reservations_${selectedOption}.csv`;
+      const fileUri = FileSystem.documentDirectory + fileName;
+
+      await FileSystem.writeAsStringAsync(fileUri, csvString, { encoding: FileSystem.EncodingType.UTF8 });
+
+      const isAvailable = await Sharing.isAvailableAsync();
+      if (isAvailable) {
+        await Sharing.shareAsync(fileUri, {
+          mimeType: 'text/csv',
+          dialogTitle: 'Download Reservation Report',
+          UTI: 'public.comma-separated-values-text'
+        });
+      } else {
+        Alert.alert('Error', 'Sharing is not available on this device.');
+      }
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Error', 'An unexpected error occurred while generating the report.');
+    }
   };
 
   const renderOption = (id: string, title: string, subtitle: string, icon: keyof typeof MaterialIcons.glyphMap) => {

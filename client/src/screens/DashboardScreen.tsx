@@ -183,7 +183,7 @@ export default function DashboardScreen() {
           <View className="flex-col gap-4 mb-12">
             <View className="flex-row justify-between items-center">
               <Text className="text-sm font-semibold tracking-wider text-on-surface-variant uppercase">Today's Schedule</Text>
-              <TouchableOpacity>
+              <TouchableOpacity onPress={() => navigation.navigate('Booking', { venue: activeVenue })}>
                 <Text className="text-base font-medium text-primary">View Calendar</Text>
               </TouchableOpacity>
             </View>
