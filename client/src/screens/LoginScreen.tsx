@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Image, KeyboardAvoidingView, Platform, Alert, BackHandler, ScrollView } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 
@@ -26,6 +26,8 @@ export default function LoginScreen() {
     }, [])
   );
 
+
+
   const handleSubmit = async () => {
     if (!email || !password) return;
     setBtnState('loading');
@@ -34,6 +36,11 @@ export default function LoginScreen() {
 
     if (result.success) {
       setBtnState('success');
+      
+      if (rememberDevice) {
+        await authService.saveCredentials(email, password);
+      }
+
       setTimeout(() => {
         setBtnState('normal');
         

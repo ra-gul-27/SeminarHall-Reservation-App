@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { View } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { authService } from '../services/authService';
 
 import LoginScreen from '../screens/LoginScreen';
 import DashboardScreen from '../screens/DashboardScreen';
@@ -12,8 +14,33 @@ import AdminDownloadScreen from '../screens/AdminDownloadScreen';
 const Stack = createNativeStackNavigator();
 
 export default function AppNavigator() {
+  const [initialRoute, setInitialRoute] = useState<string | null>(null);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const creds = await authService.loadCredentials();
+      if (creds) {
+        const result = await authService.login(creds.email, creds.password);
+        if (result.success) {
+          if (result.data?.user?.role === 'ADMIN' && creds.email === 'ADMIN5') {
+            setInitialRoute('AdminDashboard');
+          } else {
+            setInitialRoute('Dashboard');
+          }
+          return;
+        }
+      }
+      setInitialRoute('Login');
+    };
+    checkAuth();
+  }, []);
+
+  if (initialRoute === null) {
+    return <View style={{ flex: 1, backgroundColor: '#ffffff' }} />;
+  }
+
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="Login">
+    <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName={initialRoute as any}>
       <Stack.Screen name="Login">
         {() => <LoginScreen />}
       </Stack.Screen>

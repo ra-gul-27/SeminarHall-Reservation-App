@@ -6,7 +6,9 @@ import { MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import * as FileSystem from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
+import * as XLSX from 'xlsx';
 import { reservationService } from '../services/reservationService';
+import { authService } from '../services/authService';
 
 import AdminBottomNavBar from '../components/AdminBottomNavBar';
 
@@ -76,41 +78,79 @@ export default function AdminDownloadScreen() {
         return;
       }
 
-      // Generate CSV String
-      const header = "Date,Start Time,End Time,Venue,Organizer,Department,Purpose\n";
-      const rows = dataToExport.map((r: any) => {
+      // Organize Data into Sheets
+      const mainHallData: any[] = [];
+      const miniHallData: any[] = [];
+      const meetingHallData: any[] = [];
+
+      dataToExport.forEach((r: any) => {
         let parsedPurpose = { organizer: r.user?.email || 'N/A', department: 'N/A', purpose: r.purpose || 'N/A' };
         try {
           parsedPurpose = JSON.parse(r.purpose);
         } catch(e) {}
 
         const dateObj = new Date(r.startTime);
-        const dateString = dateObj.toLocaleDateString();
-        const startTimeString = dateObj.toLocaleTimeString();
-        const endTimeString = new Date(r.endTime).toLocaleTimeString();
-        
-        let venueName = 'Unknown';
-        if(r.hallId === 'main') venueName = 'MT Seminar Hall';
-        else if(r.hallId === 'mini') venueName = 'Lib Seminar Hall';
-        else if(r.hallId === 'meeting') venueName = 'Meeting Hall';
+        const row = {
+          Date: dateObj.toLocaleDateString(),
+          'Start Time': dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          'End Time': new Date(r.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          Organizer: parsedPurpose.organizer,
+          Department: parsedPurpose.department,
+          Purpose: parsedPurpose.purpose
+        };
 
-        // Escape quotes by doubling them for CSV format
-        const cleanPurpose = parsedPurpose.purpose ? parsedPurpose.purpose.replace(/"/g, '""') : '';
-        return `"${dateString}","${startTimeString}","${endTimeString}","${venueName}","${parsedPurpose.organizer}","${parsedPurpose.department}","${cleanPurpose}"`;
+        if (r.hallId === 'main') mainHallData.push(row);
+        else if (r.hallId === 'mini') miniHallData.push(row);
+        else if (r.hallId === 'meeting') meetingHallData.push(row);
       });
 
-      const csvString = header + rows.join('\n');
-      const fileName = `Campus_Reservations_${selectedOption}.csv`;
+      // Create Workbook
+      const wb = XLSX.utils.book_new();
+
+      // Column widths config
+      const wscols = [
+        { wch: 15 }, // Date
+        { wch: 12 }, // Start
+        { wch: 12 }, // End
+        { wch: 25 }, // Organizer
+        { wch: 30 }, // Department
+        { wch: 40 }  // Purpose
+      ];
+
+      if (mainHallData.length > 0) {
+        const wsMain = XLSX.utils.json_to_sheet(mainHallData);
+        wsMain['!cols'] = wscols;
+        XLSX.utils.book_append_sheet(wb, wsMain, "MT Seminar Hall");
+      }
+      if (miniHallData.length > 0) {
+        const wsMini = XLSX.utils.json_to_sheet(miniHallData);
+        wsMini['!cols'] = wscols;
+        XLSX.utils.book_append_sheet(wb, wsMini, "Lib Seminar Hall");
+      }
+      if (meetingHallData.length > 0) {
+        const wsMeeting = XLSX.utils.json_to_sheet(meetingHallData);
+        wsMeeting['!cols'] = wscols;
+        XLSX.utils.book_append_sheet(wb, wsMeeting, "Meeting Hall");
+      }
+
+      // If they somehow had reservations but none matched the 3 halls
+      if (wb.SheetNames.length === 0) {
+        Alert.alert('No Data', 'There are no standard hall reservations for this period.');
+        return;
+      }
+
+      const base64 = XLSX.write(wb, { type: 'base64', bookType: 'xlsx' });
+      const fileName = `Campus_Reservations_${selectedOption}.xlsx`;
       const fileUri = FileSystem.documentDirectory + fileName;
 
-      await FileSystem.writeAsStringAsync(fileUri, csvString, { encoding: FileSystem.EncodingType.UTF8 });
+      await FileSystem.writeAsStringAsync(fileUri, base64, { encoding: FileSystem.EncodingType.Base64 });
 
       const isAvailable = await Sharing.isAvailableAsync();
       if (isAvailable) {
         await Sharing.shareAsync(fileUri, {
-          mimeType: 'text/csv',
+          mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
           dialogTitle: 'Download Reservation Report',
-          UTI: 'public.comma-separated-values-text'
+          UTI: 'com.microsoft.excel.xls'
         });
       } else {
         Alert.alert('Error', 'Sharing is not available on this device.');
@@ -159,7 +199,10 @@ export default function AdminDownloadScreen() {
         </View>
         <TouchableOpacity
           className="w-10 h-10 items-center justify-center rounded-full"
-          onPress={() => navigation.replace('Login')}
+          onPress={() => {
+            authService.clearCredentials();
+            navigation.replace('Login');
+          }}
         >
           <Image
             source={require('../../assets/QUIT.png')}

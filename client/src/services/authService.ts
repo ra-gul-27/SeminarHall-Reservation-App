@@ -1,4 +1,5 @@
 import ENV from '../config';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const API_BASE_URL = ENV.apiUrl;
 
@@ -28,6 +29,36 @@ export const authService = {
     } catch (error) {
       console.error('Auth Service Error:', error);
       return { success: false, message: 'Could not connect to the server' };
+    }
+  },
+  saveCredentials: async (email?: string, password?: string) => {
+    try {
+      if (email && password) {
+        await AsyncStorage.setItem('@app_email', email);
+        await AsyncStorage.setItem('@app_password', password);
+      }
+    } catch (e) {
+      console.error('Failed to save credentials', e);
+    }
+  },
+  loadCredentials: async () => {
+    try {
+      const email = await AsyncStorage.getItem('@app_email');
+      const password = await AsyncStorage.getItem('@app_password');
+      if (email !== null && password !== null) {
+        return { email, password };
+      }
+    } catch (e) {
+      console.error('Failed to load credentials', e);
+    }
+    return null;
+  },
+  clearCredentials: async () => {
+    try {
+      await AsyncStorage.removeItem('@app_email');
+      await AsyncStorage.removeItem('@app_password');
+    } catch (e) {
+      console.error('Failed to clear credentials', e);
     }
   }
 };

@@ -5,6 +5,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { reservationService } from '../services/reservationService';
+import { authService } from '../services/authService';
 
 import TopAppBar from '../components/TopAppBar';
 import BottomNavBar from '../components/BottomNavBar';
@@ -85,7 +86,10 @@ export default function DashboardScreen() {
           'Are you sure you want to logout?',
           [
             { text: 'Cancel', style: 'cancel' },
-            { text: 'Logout', onPress: () => navigation.replace('Login'), style: 'destructive' },
+            { text: 'Logout', onPress: () => {
+                authService.clearCredentials();
+                navigation.replace('Login');
+              }, style: 'destructive' },
           ],
           { cancelable: true }
         );
@@ -135,7 +139,10 @@ export default function DashboardScreen() {
         </View>
         <TouchableOpacity
           className="w-10 h-10 items-center justify-center rounded-full"
-          onPress={() => navigation.navigate('Login')}
+          onPress={() => {
+            authService.clearCredentials();
+            navigation.replace('Login');
+          }}
         >
           <Image
             source={require('../../assets/QUIT.png')}
@@ -227,7 +234,7 @@ export default function DashboardScreen() {
 
 
 
-      <BottomNavBar activeTab="home" />
+      <BottomNavBar activeTab="home" activeVenue={activeVenue} />
     </SafeAreaView>
   );
 }

@@ -6,9 +6,10 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type BottomNavBarProps = {
   activeTab?: 'home' | 'book' | 'history';
+  activeVenue?: string;
 };
 
-export default function BottomNavBar({ activeTab = 'home' }: BottomNavBarProps) {
+export default function BottomNavBar({ activeTab = 'home', activeVenue }: BottomNavBarProps) {
   const navigation = useNavigation<any>();
   const insets = useSafeAreaInsets();
 
@@ -34,7 +35,7 @@ export default function BottomNavBar({ activeTab = 'home' }: BottomNavBarProps) 
         className={`flex-col items-center justify-center px-4 py-1 rounded-xl ${activeTab === 'book' ? 'bg-primary-container' : ''}`}
         activeOpacity={0.6}
         onPress={() => {
-          if (activeTab !== 'book') navigation.navigate('Booking');
+          if (activeTab !== 'book') navigation.navigate('Booking', { venue: activeVenue });
         }}
       >
         <MaterialIcons name="add-circle" size={24} color={activeTab === 'book' ? '#8293b8' : '#505f76'} />

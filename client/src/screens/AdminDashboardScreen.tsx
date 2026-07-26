@@ -5,6 +5,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 
 import { reservationService } from '../services/reservationService';
+import { authService } from '../services/authService';
 import AdminBottomNavBar from '../components/AdminBottomNavBar';
 
 type Booking = {
@@ -100,7 +101,10 @@ export default function AdminDashboardScreen() {
           'Are you sure you want to logout?',
           [
             { text: 'Cancel', style: 'cancel' },
-            { text: 'Logout', onPress: () => navigation.replace('Login'), style: 'destructive' },
+            { text: 'Logout', onPress: () => {
+                authService.clearCredentials();
+                navigation.replace('Login');
+              }, style: 'destructive' },
           ],
           { cancelable: true }
         );
@@ -211,7 +215,10 @@ export default function AdminDashboardScreen() {
         </View>
         <TouchableOpacity
           className="w-10 h-10 items-center justify-center rounded-full"
-          onPress={() => navigation.replace('Login')}
+          onPress={() => {
+            authService.clearCredentials();
+            navigation.replace('Login');
+          }}
         >
           <Image
             source={require('../../assets/QUIT.png')}
