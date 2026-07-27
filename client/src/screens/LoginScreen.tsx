@@ -13,6 +13,22 @@ export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberDevice, setRememberDevice] = useState(false);
   const [btnState, setBtnState] = useState('normal');
+  const [isCapsOn, setIsCapsOn] = useState(false);
+
+  const handlePasswordChange = (text: string) => {
+    setPassword(text);
+    if (text.length > 0) {
+      const lastChar = text[text.length - 1];
+      // Check if the last character is an uppercase letter
+      if (lastChar !== lastChar.toLowerCase() && lastChar === lastChar.toUpperCase()) {
+        setIsCapsOn(true);
+      } else {
+        setIsCapsOn(false);
+      }
+    } else {
+      setIsCapsOn(false);
+    }
+  };
 
   useFocusEffect(
     useCallback(() => {
@@ -120,7 +136,7 @@ export default function LoginScreen() {
                 </View>
                 <TextInput
                   value={password}
-                  onChangeText={setPassword}
+                  onChangeText={handlePasswordChange}
                   placeholder="••••••••"
                   placeholderTextColor="#a0a0a0"
                   secureTextEntry={!showPassword}
@@ -133,6 +149,12 @@ export default function LoginScreen() {
                   <MaterialIcons name={showPassword ? "visibility-off" : "visibility"} size={20} color="#75777f" />
                 </TouchableOpacity>
               </View>
+              {isCapsOn && (
+                <View className="flex-row items-center mt-1.5 ml-1">
+                  <MaterialIcons name="arrow-drop-up" size={24} color="#75777f" />
+                  <Text className="text-[11px] text-gray-500 font-bold ml-0.5 uppercase tracking-wider">Caps Lock is ON</Text>
+                </View>
+              )}
             </View>
 
             {/* Remember Device & Forgot Password */}

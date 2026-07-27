@@ -36,9 +36,10 @@ export default function DashboardScreen() {
       const fetchReservations = async () => {
         const response = await reservationService.getReservations();
         if (response.success && isActive) {
-          const todayStr = new Date().toISOString().split('T')[0];
-          const currentMonth = new Date().getMonth();
-          const currentYear = new Date().getFullYear();
+          const today = new Date();
+          const currentMonth = today.getMonth();
+          const currentYear = today.getFullYear();
+          const currentDate = today.getDate();
 
           const counts = { main: 0, mini: 0, meeting: 0 };
           response.data.forEach((r: any) => {
@@ -52,7 +53,10 @@ export default function DashboardScreen() {
           setMonthlyCounts(counts);
 
           const booked = response.data
-            .filter((r: any) => new Date(r.startTime).toISOString().split('T')[0] === todayStr)
+            .filter((r: any) => {
+               const d = new Date(r.startTime);
+               return d.getFullYear() === currentYear && d.getMonth() === currentMonth && d.getDate() === currentDate;
+            })
             .map((r: any) => {
               const hour = new Date(r.startTime).getHours();
               
@@ -81,18 +85,7 @@ export default function DashboardScreen() {
     useCallback(() => {
       if (Platform.OS !== 'android') return;
       const onBackPress = () => {
-        Alert.alert(
-          'Logout',
-          'Are you sure you want to logout?',
-          [
-            { text: 'Cancel', style: 'cancel' },
-            { text: 'Logout', onPress: () => {
-                authService.clearCredentials();
-                navigation.replace('Login');
-              }, style: 'destructive' },
-          ],
-          { cancelable: true }
-        );
+        BackHandler.exitApp();
         return true;
       };
       const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
@@ -131,7 +124,7 @@ export default function DashboardScreen() {
             />
           </View>
           <View>
-            <Text className="text-xl font-bold text-primary">Welcome !</Text>
+            <Text className="text-xl font-bold text-primary">Welcome</Text>
             <Text className="text-sm text-on-surface-variant">
               Today: {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
             </Text>

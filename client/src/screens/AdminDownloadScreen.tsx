@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, Image, TouchableOpacity, Alert, Platform } from 'react-native';
+import { View, Text, ScrollView, Image, TouchableOpacity, Alert, Platform, BackHandler } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import * as FileSystem from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
 import * as XLSX from 'xlsx';
@@ -20,6 +20,18 @@ export default function AdminDownloadScreen() {
   const [showStartPicker, setShowStartPicker] = useState<boolean>(false);
   const [showEndPicker, setShowEndPicker] = useState<boolean>(false);
 
+  useFocusEffect(
+    React.useCallback(() => {
+      if (Platform.OS !== 'android') return;
+      const onBackPress = () => {
+        BackHandler.exitApp();
+        return true;
+      };
+      const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+      return () => subscription.remove();
+    }, [])
+  );
+
   const onStartDateChange = (event: any, selectedDate?: Date) => {
     if (Platform.OS !== 'ios') setShowStartPicker(false);
     if (selectedDate) {
@@ -32,6 +44,10 @@ export default function AdminDownloadScreen() {
     if (selectedDate) {
       setEndDate(selectedDate);
     }
+  };
+
+  const formatDate = (d: Date) => {
+    return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
   };
 
   const handleDownload = async () => {
@@ -245,11 +261,14 @@ export default function AdminDownloadScreen() {
                   <Text className="text-xs font-bold text-on-surface-variant mb-1 uppercase tracking-wider">From Date</Text>
                   <TouchableOpacity 
                     activeOpacity={0.7}
-                    onPress={() => setShowStartPicker(true)}
+                    onPress={() => {
+                      setSelectedOption('custom_range');
+                      setShowStartPicker(true);
+                    }}
                     className="flex-row items-center bg-surface-container px-3 py-2 rounded-lg border border-outline-variant"
                   >
                     <MaterialIcons name="edit-calendar" size={16} color="#75777f" />
-                    <Text className="ml-2 text-on-surface font-medium">{startDate.toLocaleDateString()}</Text>
+                    <Text className="ml-2 text-on-surface font-medium">{formatDate(startDate)}</Text>
                   </TouchableOpacity>
                 </View>
                 <View className="px-3 pt-6">
@@ -259,11 +278,14 @@ export default function AdminDownloadScreen() {
                   <Text className="text-xs font-bold text-on-surface-variant mb-1 uppercase tracking-wider">To Date</Text>
                   <TouchableOpacity 
                     activeOpacity={0.7}
-                    onPress={() => setShowEndPicker(true)}
+                    onPress={() => {
+                      setSelectedOption('custom_range');
+                      setShowEndPicker(true);
+                    }}
                     className="flex-row items-center bg-surface-container px-3 py-2 rounded-lg border border-outline-variant"
                   >
                     <MaterialIcons name="edit-calendar" size={16} color="#75777f" />
-                    <Text className="ml-2 text-on-surface font-medium">{endDate.toLocaleDateString()}</Text>
+                    <Text className="ml-2 text-on-surface font-medium">{formatDate(endDate)}</Text>
                   </TouchableOpacity>
                 </View>
               </View>

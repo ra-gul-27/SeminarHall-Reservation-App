@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { View, Text, ScrollView, Image, TouchableOpacity, Alert, BackHandler, Platform } from 'react-native';
+import { View, Text, ScrollView, Image, TouchableOpacity, Alert, BackHandler, Platform, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
@@ -27,6 +27,8 @@ export default function AdminDashboardScreen() {
     meeting: []
   });
 
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
   const getDeptAbbreviation = (dept?: string) => {
     switch (dept) {
       case 'Computer Science & Engineering': return 'CSE';
@@ -40,6 +42,7 @@ export default function AdminDashboardScreen() {
   };
 
   const fetchReservations = async () => {
+    setIsLoading(true);
     const response = await reservationService.getReservations();
     if (response.success) {
       const today = new Date();
@@ -84,6 +87,7 @@ export default function AdminDashboardScreen() {
         meeting: bookings.filter(b => b.hallId === 'meeting')
       });
     }
+    setIsLoading(false);
   };
 
   useFocusEffect(
@@ -96,18 +100,7 @@ export default function AdminDashboardScreen() {
     useCallback(() => {
       if (Platform.OS !== 'android') return;
       const onBackPress = () => {
-        Alert.alert(
-          'Logout',
-          'Are you sure you want to logout?',
-          [
-            { text: 'Cancel', style: 'cancel' },
-            { text: 'Logout', onPress: () => {
-                authService.clearCredentials();
-                navigation.replace('Login');
-              }, style: 'destructive' },
-          ],
-          { cancelable: true }
-        );
+        BackHandler.exitApp();
         return true;
       };
       const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
@@ -139,12 +132,17 @@ export default function AdminDashboardScreen() {
 
   const renderHallSection = (title: string, data: Booking[]) => (
     <View className="mb-8">
-      <View className="flex-row items-center gap-2 mb-4 bg-surface py-2 sticky top-0 z-10">
+      <View className="flex-row items-center gap-2 mb-4 bg-surface pb-3 pt-2 border-b-2 border-gray-300 sticky top-0 z-10">
         <MaterialIcons name="business" size={24} color="#031635" />
         <Text className="text-xl font-bold text-primary">{title}</Text>
       </View>
 
-      {data.length === 0 ? (
+      {isLoading ? (
+        <View className="bg-surface-container rounded-xl p-6 items-center justify-center border border-outline-variant border-dashed">
+          <ActivityIndicator size="small" color="#031635" />
+          <Text className="text-secondary mt-3 font-medium">Fetching...</Text>
+        </View>
+      ) : data.length === 0 ? (
         <View className="bg-surface-container rounded-xl p-6 items-center justify-center border border-outline-variant border-dashed">
           <MaterialIcons name="event-busy" size={40} color="#8293b8" />
           <Text className="text-secondary mt-2 font-medium">No active bookings.</Text>
@@ -163,24 +161,24 @@ export default function AdminDashboardScreen() {
               )}
               <View className="bg-white rounded-xl border border-outline-variant p-4 flex-row items-center justify-between shadow-sm">
                 <View className="flex-col gap-1 flex-1">
-                  <View className="flex-row items-center gap-2">
-                    <View className={`px-2 py-0.5 rounded-md ${item.slot === 'fn' ? 'bg-[#eff6ff]' : 'bg-[#fdf4ff]'}`}>
+                  <View className="flex-row items-start gap-2">
+                    <View className={`px-2 py-0.5 rounded-md shrink-0 mt-0.5 ${item.slot === 'fn' ? 'bg-[#eff6ff]' : 'bg-[#fdf4ff]'}`}>
                       <Text className={`text-[10px] font-bold uppercase tracking-widest ${item.slot === 'fn' ? 'text-[#1d4ed8]' : 'text-[#a21caf]'}`}>
                         {item.slot === 'fn' ? 'Forenoon' : 'Afternoon'}
                       </Text>
                     </View>
-                    <Text className="text-base font-bold text-primary" numberOfLines={1}>{item.purpose}</Text>
+                    <Text className="text-base font-bold text-primary flex-1 leading-tight">{item.purpose}</Text>
                   </View>
-                  <View className="flex-row items-center gap-4 mt-1">
-                    <View className="flex-row items-center gap-1">
-                      <MaterialIcons name="person-outline" size={14} color="#75777f" />
-                      <Text className="text-xs text-on-surface-variant font-medium" numberOfLines={1}>
+                  <View className="flex-row items-center justify-between mt-2 gap-2">
+                    <View className="flex-row items-start gap-1 flex-1">
+                      <MaterialIcons name="person-outline" size={14} color="#75777f" style={{ marginTop: 2 }} />
+                      <Text className="text-xs text-on-surface-variant font-medium flex-1 leading-tight">
                         {item.department ? `${item.user} [${item.department}]` : item.user}
                       </Text>
                     </View>
-                    <View className="flex-row items-center gap-1">
+                    <View className="flex-row items-center gap-1 shrink-0">
                       <MaterialIcons name="schedule" size={14} color="#75777f" />
-                      <Text className="text-xs text-on-surface-variant font-medium">
+                      <Text className="text-xs text-on-surface-variant font-medium shrink-0">
                         {item.slot === 'fn' ? "10:00 AM - 12:00 PM" : "01:00 PM - 04:10 PM"}
                       </Text>
                     </View>

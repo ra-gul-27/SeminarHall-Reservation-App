@@ -22,7 +22,7 @@ export default function BottomNavBar({ activeTab = 'home', activeVenue }: Bottom
         className={`flex-col items-center justify-center px-4 py-1 rounded-xl ${activeTab === 'home' ? 'bg-primary-container' : ''}`}
         activeOpacity={0.6}
         onPress={() => {
-          if (activeTab !== 'home') navigation.goBack();
+          if (activeTab !== 'home') navigation.navigate('Dashboard');
         }}
       >
         <MaterialIcons name="home" size={24} color={activeTab === 'home' ? '#8293b8' : '#505f76'} />

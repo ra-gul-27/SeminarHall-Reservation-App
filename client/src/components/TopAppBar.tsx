@@ -14,7 +14,7 @@ export default function TopAppBar() {
           />
         </View>
         <View>
-          <Text className="text-xl font-bold text-primary">Welcome !</Text>
+          <Text className="text-xl font-bold text-primary">Welcome</Text>
           <Text className="text-sm text-on-surface-variant">
             Today: {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
           </Text>
