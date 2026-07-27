@@ -30,8 +30,9 @@ export default function FinalReservationScreen() {
   const [countdown, setCountdown] = useState(6);
 
   const [organizerName, setOrganizerName] = useState('');
-  const [department, setDepartment] = useState('Computer Science & Engineering');
+  const [department, setDepartment] = useState('Select Department');
   const [purpose, setPurpose] = useState('');
+  const [errors, setErrors] = useState({ organizerName: false, department: false, purpose: false });
   const [isDeptModalVisible, setDeptModalVisible] = useState(false);
 
   const departments = [
@@ -45,6 +46,20 @@ export default function FinalReservationScreen() {
   ];
 
   const handleConfirm = async () => {
+    const isOrganizerNameEmpty = !organizerName.trim();
+    const isDepartmentEmpty = department === 'Select Department';
+    const isPurposeEmpty = !purpose.trim();
+
+    if (isOrganizerNameEmpty || isDepartmentEmpty || isPurposeEmpty) {
+      setErrors({
+        organizerName: isOrganizerNameEmpty,
+        department: isDepartmentEmpty,
+        purpose: isPurposeEmpty
+      });
+      Alert.alert('Required Fields Missing', 'Please fill in all mandatory fields before confirming.');
+      return;
+    }
+
     setStep('processing');
 
     const year = activeDate.getFullYear();
@@ -134,38 +149,47 @@ export default function FinalReservationScreen() {
               {/* Form Inputs */}
               <View className="flex-col gap-4">
                 <View className="flex-col gap-1">
-                  <Text className="text-sm font-semibold text-on-surface-variant">Organizer Name</Text>
+                  <Text className={`text-sm font-semibold ${errors.organizerName ? 'text-red-500' : 'text-on-surface-variant'}`}>Organizer Name *</Text>
                   <TextInput
-                    className="w-full h-12 bg-surface-container-low border border-outline-variant rounded-lg px-4 text-on-surface"
+                    className={`w-full h-12 bg-surface-container-low border rounded-lg px-4 text-on-surface ${errors.organizerName ? 'border-red-500' : 'border-outline-variant'}`}
                     placeholder="Enter your full name"
                     value={organizerName}
-                    onChangeText={setOrganizerName}
+                    onChangeText={(val) => {
+                      setOrganizerName(val);
+                      if (errors.organizerName) setErrors({ ...errors, organizerName: false });
+                    }}
                   />
+                  {errors.organizerName && <Text className="text-xs text-red-500">Organizer name is required.</Text>}
                 </View>
 
                 <View className="flex-col gap-1">
-                  <Text className="text-sm font-semibold text-on-surface-variant">Department</Text>
+                  <Text className={`text-sm font-semibold ${errors.department ? 'text-red-500' : 'text-on-surface-variant'}`}>Department *</Text>
                   <TouchableOpacity
                     activeOpacity={0.7}
                     onPress={() => setDeptModalVisible(true)}
-                    className="w-full h-12 bg-surface-container-low border border-outline-variant rounded-lg px-4 flex-row justify-between items-center"
+                    className={`w-full h-12 bg-surface-container-low border rounded-lg px-4 flex-row justify-between items-center ${errors.department ? 'border-red-500' : 'border-outline-variant'}`}
                   >
-                    <Text className="text-on-surface flex-1" numberOfLines={1}>{department}</Text>
-                    <MaterialIcons name="arrow-drop-down" size={24} color="#44474e" />
+                    <Text className={`${department === 'Select Department' ? 'text-on-surface-variant' : 'text-on-surface'} flex-1`} numberOfLines={1}>{department}</Text>
+                    <MaterialIcons name="arrow-drop-down" size={24} color={errors.department ? '#ef4444' : '#44474e'} />
                   </TouchableOpacity>
+                  {errors.department && <Text className="text-xs text-red-500">Please select a department.</Text>}
                 </View>
 
                 <View className="flex-col gap-1">
-                  <Text className="text-sm font-semibold text-on-surface-variant">Event Purpose</Text>
+                  <Text className={`text-sm font-semibold ${errors.purpose ? 'text-red-500' : 'text-on-surface-variant'}`}>Event Purpose *</Text>
                   <TextInput
-                    className="w-full border border-outline-variant bg-surface-container-low rounded-lg px-4 py-3 text-on-surface"
+                    className={`w-full border bg-surface-container-low rounded-lg px-4 py-3 text-on-surface ${errors.purpose ? 'border-red-500' : 'border-outline-variant'}`}
                     placeholder="Briefly describe the seminar agenda..."
                     multiline
                     numberOfLines={4}
                     textAlignVertical="top"
                     value={purpose}
-                    onChangeText={setPurpose}
+                    onChangeText={(val) => {
+                      setPurpose(val);
+                      if (errors.purpose) setErrors({ ...errors, purpose: false });
+                    }}
                   />
+                  {errors.purpose && <Text className="text-xs text-red-500">Event purpose is required.</Text>}
                 </View>
 
                 <TouchableOpacity
@@ -202,6 +226,7 @@ export default function FinalReservationScreen() {
                       className="p-4 border-b border-outline-variant/30"
                       onPress={() => {
                         setDepartment(item);
+                        setErrors({ ...errors, department: false });
                         setDeptModalVisible(false);
                       }}
                     >

@@ -41,6 +41,8 @@ model Reservation {
 
   user      User     @relation(fields: [userId], references: [id])
   hall      Hall     @relation(fields: [hallId], references: [id])
+
+  @@unique([hallId, startTime, endTime])
 }
 
 enum Role {

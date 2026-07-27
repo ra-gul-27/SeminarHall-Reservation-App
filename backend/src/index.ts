@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Prisma } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
@@ -70,24 +70,48 @@ app.get('/api/halls', authenticateToken, async (req, res) => {
 });
 
 // 3. Reservations: Create
-app.post('/api/reservations', authenticateToken, async (req: any, res) => {
+app.post('/api/reservations', authenticateToken, async (req: any, res: any) => {
   const { hallId, startTime, endTime, purpose } = req.body;
   const userId = req.user.id;
 
   try {
-    const reservation = await prisma.reservation.create({
-      data: {
-        hallId,
-        userId,
-        startTime: new Date(startTime),
-        endTime: new Date(endTime),
-        purpose
+    const reservation = await prisma.$transaction(async (tx) => {
+      // Check for overlapping reservations
+      const overlapping = await tx.reservation.findFirst({
+        where: {
+          hallId,
+          status: { not: 'CANCELLED' },
+          AND: [
+            { startTime: { lt: new Date(endTime) } },
+            { endTime: { gt: new Date(startTime) } }
+          ]
+        }
+      });
+
+      if (overlapping) {
+        throw new Error('OVERLAPPING_RESERVATION');
       }
+
+      return await tx.reservation.create({
+        data: {
+          hallId,
+          userId,
+          startTime: new Date(startTime),
+          endTime: new Date(endTime),
+          purpose
+        }
+      });
+    }, {
+      isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
     });
-    res.status(201).json(reservation);
-  } catch (error) {
+    
+    return res.status(201).json(reservation);
+  } catch (error: any) {
     console.error(error);
-    res.status(500).json({ message: 'Error creating reservation' });
+    if (error.message === 'OVERLAPPING_RESERVATION' || error.code === 'P2034' || error.code === 'P2002') {
+      return res.status(409).json({ message: 'The hall is already booked for the selected time slot.' });
+    }
+    return res.status(500).json({ message: 'Error creating reservation' });
   }
 });
 
