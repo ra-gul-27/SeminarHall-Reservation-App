@@ -278,6 +278,9 @@ export default function AdminDownloadScreen() {
                     <Text className="ml-2 text-on-surface font-medium">{formatDate(endDate)}</Text>
                   </TouchableOpacity>
                 </View>
+                <View className="w-6 h-6 ml-4 mt-5 items-center justify-center">
+                  {selectedOption === 'custom_range' && <MaterialIcons name="check-circle" size={20} color="#031635" />}
+                </View>
               </View>
             </TouchableOpacity>
           </View>

@@ -19,6 +19,8 @@ type Booking = {
   department: string;
 };
 
+let hasFetchedInitially = false;
+
 export default function AdminDashboardScreen() {
   const navigation = useNavigation<any>();
   const [groupedBookings, setGroupedBookings] = useState<{ main: Booking[], mini: Booking[], meeting: Booking[] }>({
@@ -27,7 +29,7 @@ export default function AdminDashboardScreen() {
     meeting: []
   });
 
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(!hasFetchedInitially);
 
   const getDeptAbbreviation = (dept?: string) => {
     switch (dept) {
@@ -41,8 +43,8 @@ export default function AdminDashboardScreen() {
     }
   };
 
-  const fetchReservations = async () => {
-    setIsLoading(true);
+  const fetchReservations = async (showLoading: boolean = true) => {
+    if (showLoading) setIsLoading(true);
     const response = await reservationService.getReservations();
     if (response.success) {
       const today = new Date();
@@ -87,12 +89,13 @@ export default function AdminDashboardScreen() {
         meeting: bookings.filter(b => b.hallId === 'meeting')
       });
     }
-    setIsLoading(false);
+    if (showLoading) setIsLoading(false);
   };
 
   useFocusEffect(
     useCallback(() => {
-      fetchReservations();
+      fetchReservations(!hasFetchedInitially);
+      hasFetchedInitially = true;
     }, [])
   );
 
@@ -120,7 +123,7 @@ export default function AdminDashboardScreen() {
           onPress: async () => {
             const res = await reservationService.deleteReservation(id);
             if (res.success) {
-              fetchReservations();
+              fetchReservations(false);
             } else {
               Alert.alert("Error", res.message);
             }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, ActivityIndicator, Modal, FlatList, Alert, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, ActivityIndicator, Modal, FlatList, Alert, KeyboardAvoidingView, Platform, BackHandler } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -104,6 +104,18 @@ export default function FinalReservationScreen() {
 
     return () => clearInterval(interval);
   }, [step, countdown, navigation]);
+
+  useEffect(() => {
+    if (Platform.OS !== 'android' || step !== 'success') return;
+
+    const onBackPress = () => {
+      navigation.navigate('Dashboard');
+      return true;
+    };
+
+    const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+    return () => subscription.remove();
+  }, [step, navigation]);
 
   return (
     <SafeAreaView className="flex-1 bg-surface relative">
