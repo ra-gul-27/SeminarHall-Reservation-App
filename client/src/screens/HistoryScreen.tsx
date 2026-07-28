@@ -109,17 +109,6 @@ export default function HistoryScreen() {
     }, [])
   );
 
-  useFocusEffect(
-    useCallback(() => {
-      if (Platform.OS !== 'android') return;
-      const onBackPress = () => {
-        BackHandler.exitApp();
-        return true;
-      };
-      const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
-      return () => subscription.remove();
-    }, [])
-  );
 
   const renderHallSection = (title: string, data: Booking[], hallKey: 'main' | 'mini' | 'meeting') => {
     const currentPage = pages[hallKey];

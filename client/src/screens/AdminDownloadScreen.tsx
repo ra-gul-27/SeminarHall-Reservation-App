@@ -20,17 +20,7 @@ export default function AdminDownloadScreen() {
   const [showStartPicker, setShowStartPicker] = useState<boolean>(false);
   const [showEndPicker, setShowEndPicker] = useState<boolean>(false);
 
-  useFocusEffect(
-    React.useCallback(() => {
-      if (Platform.OS !== 'android') return;
-      const onBackPress = () => {
-        BackHandler.exitApp();
-        return true;
-      };
-      const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
-      return () => subscription.remove();
-    }, [])
-  );
+
 
   const onStartDateChange = (event: any, selectedDate?: Date) => {
     if (Platform.OS !== 'ios') setShowStartPicker(false);
