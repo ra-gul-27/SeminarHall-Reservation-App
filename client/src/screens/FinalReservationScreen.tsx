@@ -276,8 +276,8 @@ export default function FinalReservationScreen() {
               <Text className="font-bold text-[#1A365D]">{venueName}</Text>
             </View>
             <View className="flex-row justify-between items-center border-b border-outline-variant pb-4">
-              <Text className="text-sm font-semibold text-on-surface-variant uppercase">Date</Text>
-              <Text className="font-bold text-[#1A365D]">{dateStr}</Text>
+              <Text className="text-sm font-semibold text-on-surface-variant uppercase">Date & Session</Text>
+              <Text className="font-bold text-[#1A365D] text-right flex-shrink pl-4">{dateStr} | {selectedSlot === 'fn' ? 'F.N' : 'A.N'}</Text>
             </View>
             <View className="flex-row justify-between items-center">
               <Text className="text-sm font-semibold text-on-surface-variant uppercase">Host</Text>

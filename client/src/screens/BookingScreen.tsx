@@ -43,12 +43,12 @@ export default function BookingScreen() {
           const month = activeDate.getMonth();
           const booked = response.data
             .filter((r: any) => {
-               const d = new Date(r.startTime);
-               return r.hallId === venue && d.getFullYear() === year && d.getMonth() === month;
+              const d = new Date(r.startTime);
+              return r.hallId === venue && d.getFullYear() === year && d.getMonth() === month;
             })
             .map((r: any) => {
-               const d = new Date(r.startTime);
-               return { day: d.getDate(), slot: d.getHours() < 12 ? 'fn' : 'an' };
+              const d = new Date(r.startTime);
+              return { day: d.getDate(), slot: d.getHours() < 12 ? 'fn' : 'an' };
             });
           setBookedSlots(booked);
         }
@@ -74,16 +74,16 @@ export default function BookingScreen() {
     const isSelected = selectedDay === day;
     const past = isPastDay(day);
     const baseClasses = "h-10 w-[12%] m-[1%] flex items-center justify-center rounded-lg font-bold ";
-    
+
     if (past) return baseClasses + "bg-gray-100 border border-transparent opacity-50";
     if (isSelected) return baseClasses + "bg-[#031635] border-2 border-[#031635]";
 
     const fnBooked = bookedSlots.find(b => b.day === day && b.slot === 'fn');
     const anBooked = bookedSlots.find(b => b.day === day && b.slot === 'an');
 
-    if (fnBooked && anBooked) return baseClasses + "bg-[#fef2f2] border border-[#fee2e2]"; // red-50
+    if (fnBooked && anBooked) return baseClasses + "bg-[#fee2e2] border border-[#fca5a5]"; // red-100, border red-300
     if (fnBooked || anBooked) return baseClasses + "bg-[#fef3c7] border border-[#fde68a]"; // amber-100
-    
+
     return baseClasses + "bg-[#d1fae5] border border-transparent"; // emerald-100
   };
 
@@ -91,13 +91,13 @@ export default function BookingScreen() {
     const past = isPastDay(day);
     if (past) return "text-gray-400";
     if (selectedDay === day) return "text-white";
-    
+
     const fnBooked = bookedSlots.find(b => b.day === day && b.slot === 'fn');
     const anBooked = bookedSlots.find(b => b.day === day && b.slot === 'an');
 
     if (fnBooked && anBooked) return "text-[#991b1b]"; // red-800
     if (fnBooked || anBooked) return "text-[#92400e]"; // amber-800
-    
+
     return "text-[#065f46]"; // emerald-800
   };
 
@@ -181,7 +181,7 @@ export default function BookingScreen() {
       <View className="w-full bg-surface border-b border-outline-variant px-4 py-2 flex-row justify-between items-center z-50">
         <View className="flex-row items-center gap-2">
           <View className="w-10 h-10 rounded-full overflow-hidden border border-outline-variant bg-primary-container">
-            <Image 
+            <Image
               source={require('../../assets/ifet-logo.png')}
               className="w-full h-full bg-white"
               resizeMode="contain"
@@ -189,7 +189,7 @@ export default function BookingScreen() {
           </View>
           <Text className="text-xl font-bold text-primary">Campus Reservations</Text>
         </View>
-        <TouchableOpacity 
+        <TouchableOpacity
           className="w-10 h-10 items-center justify-center rounded-full"
           activeOpacity={0.6}
           onPress={() => navigation.goBack()}
@@ -200,7 +200,7 @@ export default function BookingScreen() {
 
       <ScrollView contentContainerClassName="p-4 pb-[120px]" className="flex-1 w-full">
         <View className="w-full max-w-[480px] self-center">
-          
+
           {/* Breadcrumb / Header Title */}
           <View className="flex-col gap-1 mb-6 mt-4">
             <Text className="text-3xl font-bold text-primary">Select Date & Slot</Text>
@@ -214,14 +214,14 @@ export default function BookingScreen() {
                 {activeDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
               </Text>
               <View className="flex-row gap-2">
-                <TouchableOpacity 
+                <TouchableOpacity
                   className={`p-1 rounded-full ${monthOffset === 0 ? 'opacity-30' : ''}`}
                   disabled={monthOffset === 0}
                   onPress={prevMonth}
                 >
                   <MaterialIcons name="chevron-left" size={24} color="#031635" />
                 </TouchableOpacity>
-                <TouchableOpacity 
+                <TouchableOpacity
                   className={`p-1 rounded-full ${monthOffset >= 2 ? 'opacity-30' : ''}`}
                   disabled={monthOffset >= 2}
                   onPress={nextMonth}
@@ -265,15 +265,15 @@ export default function BookingScreen() {
             <Text className="text-xl font-bold text-primary">
               Available Sessions {selectedDay ? `for ${activeDate.toLocaleDateString('en-US', { month: 'long' })} ${selectedDay}` : ''}
             </Text>
-            
+
             <View className="flex-row gap-4">
               {/* Forenoon Slot */}
-              <TouchableOpacity 
+              <TouchableOpacity
                 className={getSlotClasses('fn')}
                 onPress={() => setSelectedSlot('fn')}
                 disabled={currentSlotData?.fn === 'booked' || currentSlotData?.fn === 'expired'}
               >
-                <Text className={`text-2xl font-bold mb-1 ${getSlotTextColor('fn')}`}>F.N.</Text>
+                <Text className={`text-2xl font-bold mb-1 ${getSlotTextColor('fn')}`}>F.N</Text>
                 <View className="flex-row items-center gap-1">
                   <MaterialIcons name={getSlotIcon('fn')} size={16} color={getSlotIconColor('fn')} />
                   <Text className={`text-sm font-bold ${getSlotTextColor('fn')}`}>{getSlotStatusText('fn')}</Text>
@@ -281,12 +281,12 @@ export default function BookingScreen() {
               </TouchableOpacity>
 
               {/* Afternoon Slot */}
-              <TouchableOpacity 
+              <TouchableOpacity
                 className={getSlotClasses('an')}
                 onPress={() => setSelectedSlot('an')}
                 disabled={currentSlotData?.an === 'booked' || currentSlotData?.an === 'expired'}
               >
-                <Text className={`text-2xl font-bold mb-1 ${getSlotTextColor('an')}`}>A.N.</Text>
+                <Text className={`text-2xl font-bold mb-1 ${getSlotTextColor('an')}`}>A.N</Text>
                 <View className="flex-row items-center gap-1">
                   <MaterialIcons name={getSlotIcon('an')} size={16} color={getSlotIconColor('an')} />
                   <Text className={`text-sm font-bold ${getSlotTextColor('an')}`}>{getSlotStatusText('an')}</Text>
