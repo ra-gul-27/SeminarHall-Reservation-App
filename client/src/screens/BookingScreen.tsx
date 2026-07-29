@@ -242,6 +242,22 @@ export default function BookingScreen() {
             <View className="flex-row flex-wrap justify-start">
               {calendarDays}
             </View>
+
+            {/* Color Legend */}
+            <View className="flex-row items-center justify-center gap-4 mt-4 pt-4 border-t-2 border-gray-200">
+              <View className="flex-row items-center gap-1.5">
+                <View className="w-3 h-3 rounded-full bg-[#6ee7b7] border border-[#34d399]" />
+                <Text className="text-xs font-bold text-gray-700">Available</Text>
+              </View>
+              <View className="flex-row items-center gap-1.5">
+                <View className="w-3 h-3 rounded-full bg-[#fcd34d] border border-[#fbbf24]" />
+                <Text className="text-xs font-bold text-gray-700">1 Slot Left</Text>
+              </View>
+              <View className="flex-row items-center gap-1.5">
+                <View className="w-3 h-3 rounded-full bg-[#fca5a5] border border-[#f87171]" />
+                <Text className="text-xs font-bold text-gray-700">Booked</Text>
+              </View>
+            </View>
           </View>
 
           {/* Section 2: Dynamic Slot Selection */}

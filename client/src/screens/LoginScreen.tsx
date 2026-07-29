@@ -197,9 +197,6 @@ export default function LoginScreen() {
               <MaterialIcons name="shield" size={14} color="#75777f" className="mr-1.5" />
               <Text className="text-[10px] font-bold text-gray-500 tracking-wider">END-TO-END ENCRYPTED</Text>
             </View>
-            <Text className="text-xs text-gray-500 mt-4">
-              Need help? <Text className="font-bold text-[#031635]">IT Support Desk</Text>
-            </Text>
           </View>
 
           </View>
