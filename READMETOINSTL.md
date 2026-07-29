@@ -119,4 +119,10 @@ The client is a cross-platform mobile application powered by Expo.
 - **Metro Bundler Cache Issues:** If the React Native app looks visually broken or refuses to update code changes, start the Expo server and clear the cache using: `npx expo start -c`
 - **Port Clashes:** If port 3000 is occupied, you can change the backend port in `backend/src/index.ts` and update the respective API base URLs in the client.
 
+//just for edu purpose alone access my supabase as(.env)
+DATABASE_URL="postgresql://postgres.wmwguctlqgjzbqflkiiv:Ragul_%3F%402006@aws-1-ap-south-1.pooler.supabase.com:6543/postgres?pgbouncer=true"
+DIRECT_URL="postgresql://postgres.wmwguctlqgjzbqflkiiv:Ragul_%3F%402006@aws-1-ap-south-1.pooler.supabase.com:5432/postgres"
+
+JWT_SECRET="my-super-secret-key-123"
+//
 Happy Coding! 🚀
