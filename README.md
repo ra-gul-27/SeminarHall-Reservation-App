@@ -62,7 +62,7 @@ This architecture is chosen to guarantee **scalability** and **maintainability**
    - Configure your `.env` file with the correct Postgres connection string.
    - Run `npx prisma db push` or `npx prisma migrate dev` to sync the database schema or (npx prisma generate)<-best.
    - Run `npm start` or `npm run dev` to start the API server.
-3.**SUR**
+//(Just used when on local storage)3.**SUR**
 -DATABASE_URL="postgresql://postgres:Ragul@2006@localhost:5432/seminar_halls?schema=public"
 -JWT_SECRET="super-secret-seminar-key-change-in-production"
 PORT=5000
