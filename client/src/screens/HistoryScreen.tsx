@@ -25,7 +25,7 @@ export default function HistoryScreen() {
     mini: [],
     meeting: []
   });
-  
+
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const [pages, setPages] = useState<{ main: number, mini: number, meeting: number }>({
@@ -46,6 +46,13 @@ export default function HistoryScreen() {
       case 'Artificial Intelligence & Data Science': return 'AIDS';
       case 'Artificial Intelligence & Machine Learning': return 'AIML';
       case 'Mechanical Engineering': return 'MECH';
+      case 'CSE [Cyber Security]': return 'CSE (CS)';
+      case 'Information Technology': return 'IT';
+      case 'Master of Business Administration': return 'MBA';
+      case 'ECE [VLSI]': return 'ECE (VLSI)';
+      case 'Innovation Park': return 'IP';
+      case 'Placement and Training': return 'P&T';
+      case 'Management': return 'MGMT';
       default: return dept ? dept.substring(0, 4).toUpperCase() : '';
     }
   };
@@ -136,47 +143,47 @@ export default function HistoryScreen() {
         ) : (
           <View className="flex-col gap-4">
             {paginatedData.map((item, index) => (
-            <View key={item.id} className="relative">
-              {(index === 0 || paginatedData[index - 1].dateStr !== item.dateStr) && (
-                <View className="flex-row items-center gap-2 mb-2 ml-1 mt-2">
-                  <MaterialIcons name="calendar-today" size={14} color="#505f76" />
-                  <Text className="text-sm font-bold text-secondary uppercase tracking-wider">
-                    {item.dateStr}
-                  </Text>
-                </View>
-              )}
-              <View className="bg-white rounded-xl border border-outline-variant p-4 flex-row items-center justify-between shadow-sm">
-                <View className="flex-col gap-1 flex-1">
-                  <View className="flex-row items-start gap-2">
-                    <View className={`px-2 py-0.5 rounded-md shrink-0 mt-0.5 ${item.slot === 'fn' ? 'bg-[#eff6ff]' : 'bg-[#fdf4ff]'}`}>
-                      <Text className={`text-[10px] font-bold uppercase tracking-widest ${item.slot === 'fn' ? 'text-[#1d4ed8]' : 'text-[#a21caf]'}`}>
-                        {item.slot === 'fn' ? 'Forenoon' : 'Afternoon'}
-                      </Text>
-                    </View>
-                    <Text className="text-base font-bold text-primary flex-1 leading-tight">{item.purpose}</Text>
+              <View key={item.id} className="relative">
+                {(index === 0 || paginatedData[index - 1].dateStr !== item.dateStr) && (
+                  <View className="flex-row items-center gap-2 mb-2 ml-1 mt-2">
+                    <MaterialIcons name="calendar-today" size={14} color="#505f76" />
+                    <Text className="text-sm font-bold text-secondary uppercase tracking-wider">
+                      {item.dateStr}
+                    </Text>
                   </View>
-                  <View className="flex-row items-center justify-between mt-2 gap-2">
-                    <View className="flex-row items-start gap-1 flex-1">
-                      <MaterialIcons name="person-outline" size={14} color="#75777f" style={{ marginTop: 2 }} />
-                      <Text className="text-xs text-on-surface-variant font-medium flex-1 leading-tight">
-                        {item.department ? `${item.user} [${item.department}]` : item.user}
-                      </Text>
+                )}
+                <View className="bg-white rounded-xl border border-outline-variant p-4 flex-row items-center justify-between shadow-sm">
+                  <View className="flex-col gap-1 flex-1">
+                    <View className="flex-row items-start gap-2">
+                      <View className={`px-2 py-0.5 rounded-md shrink-0 mt-0.5 ${item.slot === 'fn' ? 'bg-[#eff6ff]' : 'bg-[#fdf4ff]'}`}>
+                        <Text className={`text-[10px] font-bold uppercase tracking-widest ${item.slot === 'fn' ? 'text-[#1d4ed8]' : 'text-[#a21caf]'}`}>
+                          {item.slot === 'fn' ? 'Forenoon' : 'Afternoon'}
+                        </Text>
+                      </View>
+                      <Text className="text-base font-bold text-primary flex-1 leading-tight">{item.purpose}</Text>
                     </View>
-                    <View className="flex-row items-center gap-1 shrink-0">
-                      <MaterialIcons name="schedule" size={14} color="#75777f" />
-                      <Text className="text-xs text-on-surface-variant font-medium shrink-0">
-                        {item.slot === 'fn' ? "10:00 AM - 12:00 PM" : "01:00 PM - 04:10 PM"}
-                      </Text>
+                    <View className="flex-row items-center justify-between mt-2 gap-2">
+                      <View className="flex-row items-start gap-1 flex-1">
+                        <MaterialIcons name="person-outline" size={14} color="#75777f" style={{ marginTop: 2 }} />
+                        <Text className="text-xs text-on-surface-variant font-medium flex-1 leading-tight">
+                          {item.department ? `${item.user} [${item.department}]` : item.user}
+                        </Text>
+                      </View>
+                      <View className="flex-row items-center gap-1 shrink-0">
+                        <MaterialIcons name="schedule" size={14} color="#75777f" />
+                        <Text className="text-xs text-on-surface-variant font-medium shrink-0">
+                          {item.slot === 'fn' ? "10:00 AM - 12:00 PM" : "01:00 PM - 04:10 PM"}
+                        </Text>
+                      </View>
                     </View>
                   </View>
                 </View>
               </View>
-            </View>
             ))}
-            
+
             {totalPages > 1 && (
               <View className="flex-row items-center justify-between mt-2 bg-white rounded-xl border border-outline-variant p-2 shadow-sm">
-                <TouchableOpacity 
+                <TouchableOpacity
                   disabled={currentPage === 0}
                   onPress={() => handlePageChange(hallKey, -1)}
                   className={`flex-row items-center px-4 py-2 rounded-lg ${currentPage === 0 ? 'bg-gray-100' : 'bg-[#031635]'}`}
@@ -189,7 +196,7 @@ export default function HistoryScreen() {
                   {currentPage + 1} / {totalPages}
                 </Text>
 
-                <TouchableOpacity 
+                <TouchableOpacity
                   disabled={currentPage >= totalPages - 1}
                   onPress={() => handlePageChange(hallKey, 1)}
                   className={`flex-row items-center px-4 py-2 rounded-lg ${currentPage >= totalPages - 1 ? 'bg-gray-100' : 'bg-[#031635]'}`}

@@ -46,6 +46,7 @@ export default function FinalReservationScreen() {
     'Information Technology',
     'ECE [VLSI]',
     'Master of Business Administration',
+    'Innovation Park',
     'Placement and Training',
     'Management'
   ];

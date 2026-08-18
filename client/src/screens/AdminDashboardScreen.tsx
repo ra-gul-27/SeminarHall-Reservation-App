@@ -39,6 +39,13 @@ export default function AdminDashboardScreen() {
       case 'Artificial Intelligence & Data Science': return 'AIDS';
       case 'Artificial Intelligence & Machine Learning': return 'AIML';
       case 'Mechanical Engineering': return 'MECH';
+      case 'CSE [Cyber Security]': return 'CSE (CS)';
+      case 'Information Technology': return 'IT';
+      case 'Master of Business Administration': return 'MBA';
+      case 'ECE [VLSI]': return 'ECE (VLSI)';
+      case 'Innovation Park': return 'IP';
+      case 'Placement and Training': return 'P&T';
+      case 'Management': return 'MGMT';
       default: return dept ? dept.substring(0, 4).toUpperCase() : '';
     }
   };
