@@ -43,6 +43,8 @@ export default function FinalReservationScreen() {
     'Artificial Intelligence & Machine Learning',
     'Mechanical Engineering',
     'CSE [Cyber Security]',
+    'Information Technology',
+    'ECE [VLSI]',
     'Master of Business Administration',
     'Placement and Training',
     'Management'
