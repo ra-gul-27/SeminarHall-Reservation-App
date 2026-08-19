@@ -52,6 +52,8 @@ export default function HistoryScreen() {
       case 'ECE [VLSI]': return 'ECE (VLSI)';
       case 'Innovation Park': return 'IP';
       case 'Placement and Training': return 'P&T';
+      case 'Professional Society': return 'PS';
+      case 'Research and Development': return 'R&D';
       case 'Management': return 'MGMT';
       default: return dept ? dept.substring(0, 4).toUpperCase() : '';
     }

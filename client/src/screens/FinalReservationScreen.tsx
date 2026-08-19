@@ -48,6 +48,8 @@ export default function FinalReservationScreen() {
     'Master of Business Administration',
     'Innovation Park',
     'Placement and Training',
+    'Professional Society',
+    'Research and Development',
     'Management'
   ];
 
