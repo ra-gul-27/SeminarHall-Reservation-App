@@ -240,7 +240,9 @@ export default function FinalReservationScreen() {
                   <FlatList
                     data={departments}
                     keyExtractor={(item) => item}
-                    showsVerticalScrollIndicator={false}
+                    showsVerticalScrollIndicator={true}
+                    persistentScrollbar={true}
+                    indicatorStyle="black"
                     renderItem={({ item }) => (
                       <TouchableOpacity
                         className="p-4 border-b border-outline-variant/30"
