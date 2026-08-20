@@ -50,7 +50,8 @@ export default function FinalReservationScreen() {
     'Placement and Training',
     'Professional Society',
     'Research and Development',
-    'Management'
+    'Management',
+    'IIG'
   ];
 
   const handleConfirm = async () => {
