@@ -12,6 +12,37 @@ import BottomNavBar from '../components/BottomNavBar';
 import VenueSelector from '../components/VenueSelector';
 import SessionCard from '../components/SessionCard';
 
+function AnimatedCount({ targetCount }: { targetCount: number }) {
+  const [count, setCount] = useState(0);
+
+  React.useEffect(() => {
+    let start = 0;
+    const duration = 1000; // 1 second animation
+    const incrementTime = 30; // Update every 30ms for smoothness
+    const totalSteps = duration / incrementTime;
+    const stepValue = targetCount / totalSteps;
+
+    if (targetCount === 0) {
+      setCount(0);
+      return;
+    }
+
+    const timer = setInterval(() => {
+      start += stepValue;
+      if (start >= targetCount) {
+        setCount(targetCount);
+        clearInterval(timer);
+      } else {
+        setCount(Math.floor(start));
+      }
+    }, incrementTime);
+
+    return () => clearInterval(timer);
+  }, [targetCount]);
+
+  return <Text className="text-2xl font-bold text-primary">{count}</Text>;
+}
+
 export default function DashboardScreen() {
   const navigation = useNavigation<any>();
   const [activeVenue, setActiveVenue] = useState('main');
@@ -213,7 +244,7 @@ export default function DashboardScreen() {
           <View className="flex-row gap-4 mb-4">
             <View className="flex-1 p-4 rounded-xl bg-white border border-outline-variant flex-col gap-1">
               <MaterialIcons name="event-note" size={24} color="#031635" className="mb-1" />
-              <Text className="text-2xl font-bold text-primary">{monthlyCounts[activeVenue as keyof typeof monthlyCounts]}</Text>
+              <AnimatedCount targetCount={monthlyCounts[activeVenue as keyof typeof monthlyCounts]} />
               <Text className="text-sm font-semibold tracking-wider text-on-surface-variant">Monthly Bookings</Text>
             </View>
             <View className="flex-1 p-4 rounded-xl bg-white border border-outline-variant flex-col gap-1">
