@@ -50,13 +50,22 @@ export default function DashboardScreen() {
   const [monthlyCounts, setMonthlyCounts] = useState({ main: 0, mini: 0, meeting: 0 });
 
   const getDeptAbbreviation = (dept?: string) => {
-    switch(dept) {
+    switch (dept) {
       case 'Computer Science & Engineering': return 'CSE';
       case 'Electronics and Communication Engineering': return 'ECE';
       case 'Electrical and Electronics Engineering': return 'EEE';
       case 'Artificial Intelligence & Data Science': return 'AIDS';
       case 'Artificial Intelligence & Machine Learning': return 'AIML';
       case 'Mechanical Engineering': return 'MECH';
+      case 'CSE [Cyber Security]': return 'CSE (CS)';
+      case 'Information Technology': return 'IT';
+      case 'Master of Business Administration': return 'MBA';
+      case 'ECE [VLSI]': return 'ECE (VLSI)';
+      case 'Innovation Park': return 'IP';
+      case 'Placement and Training': return 'P&T';
+      case 'Professional Society': return 'PS';
+      case 'Research and Development': return 'R&D';
+      case 'Management': return 'MGMT';
       default: return dept ? dept.substring(0, 4).toUpperCase() : '';
     }
   };
