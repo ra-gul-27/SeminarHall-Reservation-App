@@ -84,7 +84,7 @@ export default function SessionCard({ time, title, status, instructor, instructo
                   <MaterialIcons name="person" size={16} color="#75777f" />
                 )}
               </View>
-              <Text className="text-sm text-on-surface">Staff Member: <Text className="font-bold">{instructor}</Text></Text>
+              <Text className="text-sm text-on-surface flex-1">Staff Member: <Text className="font-bold">{instructor}</Text></Text>
             </View>
           )}
           {purposeText && (
